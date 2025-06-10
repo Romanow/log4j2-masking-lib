@@ -21,7 +21,7 @@ jobs:
           cache: "gradle"
 
       - name: Build
-        run: ./gradlew log-masking-lib:publish
+        run: ./gradlew publish
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

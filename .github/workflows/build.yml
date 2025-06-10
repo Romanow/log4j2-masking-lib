@@ -22,7 +22,7 @@ jobs:
           cache: "gradle"
 
       - name: Build and Test
-        run: ./gradlew clean build jacocoTestReport
+        run: ./gradlew clean build
 
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}

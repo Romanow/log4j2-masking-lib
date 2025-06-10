@@ -1,10 +1,10 @@
-[![CI](https://github.com/Romanow/log4j-masking/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Romanow/log4j-masking/actions/workflows/build.yml)
+[![CI](https://github.com/Romanow/log4j2-masking-lib/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Romanow/log4j2-masking-lib/actions/workflows/build.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Release](https://img.shields.io/github/v/release/Romanow/log4j-masking?logo=github&sort=semver)](https://github.com/Romanow/log4j-masking/releases/latest)
-[![Codecov](https://codecov.io/gh/Romanow/log4j-masking/branch/master/graph/badge.svg?token=Cckw6pHLh7)](https://codecov.io/gh/Romanow/log4j-masking)
-[![License](https://img.shields.io/github/license/Romanow/log4j-masking)](https://github.com/Romanow/log4j-masking/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/v/release/Romanow/log4j2-masking-lib?logo=github&sort=semver)](https://github.com/Romanow/log4j2-masking-lib/releases/latest)
+[![Codecov](https://codecov.io/gh/Romanow/log4j2-masking-lib/branch/master/graph/badge.svg?token=Cckw6pHLh7)](https://codecov.io/gh/Romanow/log4j2-masking-lib)
+[![License](https://img.shields.io/github/license/Romanow/log4j2-masking-lib)](https://github.com/Romanow/log4j2-masking-lib/blob/master/LICENSE)
 
-# Masking logs
+# Masking library for Log4j2
 
 ## Подключение
 
@@ -69,5 +69,4 @@ masking:
     type: TEXT
   - regex: '(?:JWT|Authorization)\s*(?::|=)\s*(.+)'
     type: TEXT
-
  ```
