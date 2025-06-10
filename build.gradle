@@ -1,18 +1,18 @@
 plugins {
     id "idea"
     id "jacoco"
-    id "org.jetbrains.kotlin.jvm" version "1.9.22"
-    id "org.jetbrains.kotlin.plugin.spring" version "1.9.22"
-    id "org.jetbrains.kotlin.kapt" version "1.9.22"
-    id "org.jlleitschuh.gradle.ktlint" version "12.1.1"
-    id "org.springframework.boot" version "3.3.3"
-    id "io.spring.dependency-management" version "1.1.6"
-    id "com.gorylenko.gradle-git-properties" version "2.4.2"
+    id "maven-publish"
+    id "org.jetbrains.kotlin.jvm" version "1.9.25"
+    id "org.jetbrains.kotlin.kapt" version "1.9.25"
+    id "org.jlleitschuh.gradle.ktlint" version "12.3.0"
 }
 
 ext {
-    springBootVersion = "3.3.3"
-    logstashLayoutVersion = "1.0.5"
+    kotlinVersion = "1.9.25"
+    snakeYamlVersion = "2.3"
+    log4j2Version = "2.24.0"
+    junitVersion = "5.11.0"
+    assertjVersion = "3.26.3"
 }
 
 idea {
@@ -32,32 +32,55 @@ ktlint {
     version.set("1.2.1")
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-    }
-}
-
-configurations {
-    implementation {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
-    }
-}
-
 dependencies {
-    implementation project("log-masking-lib")
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    api "org.apache.logging.log4j:log4j-layout-template-json:$log4j2Version"
+    api "org.yaml:snakeyaml:$snakeYamlVersion"
+    kapt "org.apache.logging.log4j:log4j-core:$log4j2Version"
 
-    implementation "org.apache.logging.log4j:log4j-layout-template-json"
-    kapt "org.apache.logging.log4j:log4j-core"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    testImplementation "org.assertj:assertj-core:$assertjVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+}
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
+check.dependsOn jacocoTestReport
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom {
+                name = "log-masking-lib"
+                description = "Masking logs implementation lib"
+                licenses {
+                    license {
+                        name = "The MIT License"
+                        url = "https://opensource.org/license/mit"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Romanov Alex"
+                        email = "romanowalex@mail.ru"
+                    }
+                }
+                scm {
+                    url = "https://github.com/Romanow/logs-masking-example/"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/Romanow/logs-masking-example")
+            credentials {
+                username = System.getenv("GITHUB_USER")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 test {
@@ -65,44 +88,4 @@ test {
     testLogging {
         showStandardStreams = true
     }
-}
-
-jacocoTestReport {
-    reports {
-        xml.required = true
-        html.required = false
-    }
-}
-
-check.dependsOn jacocoTestReport
-
-processResources {
-    filesMatching(["**/properties-from-gradle.properties"]) {
-        expand(project.properties)
-    }
-}
-
-gitProperties {
-    dateFormat = "dd.MM.yyyy HH:mm:ss"
-    dateFormatTimeZone = "Europe/Moscow"
-    extProperty = "gitProps"
-}
-
-generateGitProperties.outputs.upToDateWhen { false }
-
-bootJar {
-    archiveFileName = "${project.name}.jar"
-    manifest {
-        attributes(
-            "Application-Name": "${project.name}",
-            "Application-Version": "${project.version}",
-            "Git-Branch": "${-> project.ext.gitProps["git.branch"]}",
-            "Build-Revision": "${-> project.ext.gitProps["git.commit.id.abbrev"]}",
-            "Commit-Time": "${-> project.ext.gitProps["git.commit.time"]}"
-        )
-    }
-}
-
-jar {
-    enabled = false
 }

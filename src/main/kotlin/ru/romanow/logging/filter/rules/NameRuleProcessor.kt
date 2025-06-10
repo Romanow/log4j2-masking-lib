@@ -1,6 +1,8 @@
 package ru.romanow.logging.filter.rules
 
-open class NameRuleProcessor(field: String?) : BaseRuleProcessor(NAME_REGEX.format(field).toRegex()) {
+import kotlin.text.RegexOption.IGNORE_CASE
+
+open class NameRuleProcessor(field: String?) : BaseRuleProcessor(NAME_REGEX.format(field).toRegex(IGNORE_CASE)) {
     override fun mask(text: String): String {
         val length = text.length
         return if (length > 7) {
@@ -11,6 +13,6 @@ open class NameRuleProcessor(field: String?) : BaseRuleProcessor(NAME_REGEX.form
     }
 
     companion object {
-        const val NAME_REGEX = "\"%s\"\\s*:\\s*\"(.+)\""
+        const val NAME_REGEX = "\"%s\"\\s*:\\s*\"([^\"@]+)\""
     }
 }

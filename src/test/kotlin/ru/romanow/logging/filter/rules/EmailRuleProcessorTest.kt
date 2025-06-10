@@ -1,8 +1,7 @@
-package ru.romanow.logging.filter
+package ru.romanow.logging.filter.rules
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import ru.romanow.logging.filter.rules.EmailRuleProcessor
 
 class EmailRuleProcessorTest {
 

@@ -1,6 +1,10 @@
 ---
 masking:
+  - field: 'surname'
+    type: NAME
   - field: 'fullName'
+    type: FULL_NAME
+  - field: 'fullNameShort'
     type: FULL_NAME
   - field: 'lastName'
     type: NAME

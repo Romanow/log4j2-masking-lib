@@ -1,3 +1,1 @@
-rootProject.name = "logs-masking-example"
-
-include "log-masking-lib"
+rootProject.name = "log4j2-masking-lib"

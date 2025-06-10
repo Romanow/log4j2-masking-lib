@@ -14,15 +14,18 @@ import ru.romanow.logging.properties.RuleType.*
 
 @ConverterKeys("mask")
 @Plugin(name = "MaskingConverter", category = "Converter")
-class MaskingConverter private constructor(
+class MaskingConverter(
     private val formatters: MutableList<PatternFormatter>
 ) : LogEventPatternConverter("mask", "mask") {
 
     private var rules = mutableListOf<RuleProcessor>()
 
     init {
-        val stream = object {}.javaClass.classLoader.getResourceAsStream("logging/masking.yml")
-        val properties = Yaml().loadAs(stream, MaskingProperties::class.java)
+        val properties = loadRules("logging/rules.yml")!!
+        val additionalProperties = loadRules("logging/additional-rules.yml")
+        if (additionalProperties != null) {
+            properties.masking?.addAll(additionalProperties.masking!!)
+        }
 
         for ((type, field, regex) in properties.masking!!) {
             val ruleProcessor = when (type!!) {
@@ -36,7 +39,7 @@ class MaskingConverter private constructor(
     }
 
     override fun format(event: LogEvent, toAppendTo: StringBuilder) {
-        val buffer = java.lang.StringBuilder()
+        val buffer = StringBuilder()
         for (formatter in formatters) {
             formatter.format(event, buffer)
         }
@@ -44,12 +47,21 @@ class MaskingConverter private constructor(
         toAppendTo.append(message)
     }
 
-    private fun mask(message: String): String {
+    fun mask(message: String): String {
         var result = message
         for (rule in rules) {
             result = rule.apply(result)
         }
         return result
+    }
+
+    private fun loadRules(location: String): MaskingProperties? {
+        val stream = object {}.javaClass.classLoader.getResourceAsStream(location)
+        return if (stream != null) {
+            Yaml().loadAs(stream, MaskingProperties::class.java)
+        } else {
+            null
+        }
     }
 
     companion object {

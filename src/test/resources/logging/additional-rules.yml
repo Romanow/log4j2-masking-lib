@@ -1,0 +1,6 @@
+---
+masking:
+  - field: 'createdBy'
+    type: FULL_NAME
+  - field: 'role\d{4,8}'
+    type: FULL_NAME

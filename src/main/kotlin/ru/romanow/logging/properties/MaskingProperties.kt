@@ -1,7 +1,7 @@
 package ru.romanow.logging.properties
 
 data class MaskingProperties(
-    var masking: List<MaskingRules>? = null
+    var masking: MutableList<MaskingRules>? = null
 )
 
 data class MaskingRules(
