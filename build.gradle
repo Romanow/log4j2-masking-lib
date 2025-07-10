@@ -2,6 +2,7 @@ plugins {
     id "idea"
     id "jacoco"
     id "maven-publish"
+    id "org.jreleaser" version "1.19.0"
     id "org.jetbrains.kotlin.jvm" version "1.9.25"
     id "org.jetbrains.kotlin.kapt" version "1.9.25"
     id "org.jlleitschuh.gradle.ktlint" version "12.3.0"
@@ -20,6 +21,11 @@ idea {
         downloadJavadoc = true
         downloadSources = true
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "17"
@@ -45,6 +51,13 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 check.dependsOn jacocoTestReport
 
 publishing {
@@ -54,6 +67,7 @@ publishing {
             pom {
                 name = "log4j2-masking-lib"
                 description = "Masking library for Log4j2"
+                url = "https://github.com/Romanow/log4j2-masking-lib/"
                 licenses {
                     license {
                         name = "The MIT License"
@@ -62,30 +76,40 @@ publishing {
                 }
                 developers {
                     developer {
-                        name = "Romanov Alex"
-                        email = "romanowalex@mail.ru"
+                        id = "Romanow"
+                        name = "Romanov Alexey"
+                        email = "romanow.tech@gmail.com"
                     }
                 }
                 scm {
                     url = "https://github.com/Romanow/log4j2-masking-lib/"
+                    connection = "scm:git:https://github.com/Romanow/log4j2-masking-lib.git"
+                    developerConnection = "scm:git:ssh://github.com/Romanow/log4j2-masking-lib.git"
                 }
             }
         }
     }
     repositories {
         maven {
-            url = uri("https://maven.pkg.github.com/Romanow/log4j2-masking-lib")
-            credentials {
-                username = System.getenv("GITHUB_USER")
-                password = System.getenv("GITHUB_TOKEN")
-            }
+            url = "build/staging-deploy"
         }
     }
 }
 
-test {
-    useJUnitPlatform()
-    testLogging {
-        showStandardStreams = true
+jreleaser {
+    signing {
+        active = "ALWAYS"
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = "ALWAYS"
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@
 ```xml
 
 <dependency>
-    <groupId>ru.romanow.logging</groupId>
+    <groupId>ru.romanow-alex</groupId>
     <artifactId>log4j2-masking-lib</artifactId>
     <version>${log-masking-lib.version}</version>
 </dependency>
@@ -22,7 +22,7 @@
 ### Gradle
 
 ```groovy
-testImplementation "ru.romanow.logging:log4j2-masking-lib:$logMaskingVersion"
+testImplementation "ru.romanow-alex:log4j2-masking-lib:$logMaskingVersion"
 ```
 
 ## Реализация
