@@ -10,7 +10,7 @@ class EmailRuleProcessorTest {
         val processor = EmailRuleProcessor("email")
         assertThat(processor.apply("\"email\" : \"romanowalex@mail.ru\""))
             .isEqualTo("\"email\" : \"r**********@mail.ru\"")
-        assertThat(processor.apply("\"email\" : \"aleksey.romanov@inno.tech\""))
-            .isEqualTo("\"email\" : \"a**************@inno.tech\"")
+        assertThat(processor.apply("\"email\" : \"aleksey.romanov@mail.ru\""))
+            .isEqualTo("\"email\" : \"a**************@mail.ru\"")
     }
 }
