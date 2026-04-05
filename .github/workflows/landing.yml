@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "landing/**"
+#    paths:
+#      - "landing/**"
 
 jobs:
   deploy:
