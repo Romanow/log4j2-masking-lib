@@ -21,6 +21,9 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: Validate styles
+        uses: pre-commit/action@v3.0.0
+
       - name: Build and Test
         run: ./gradlew clean build
 
