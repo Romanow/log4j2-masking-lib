@@ -6,10 +6,9 @@
 2. Делаем простейшую лендинг из `README.md` проекта.
 3. А теперь делаем красивую страницу.
 4. Где нам разместить эту страницу?
-5. Настраиваем деплой на Github Pages.
-6. Что ещё можно сделать на GitHub Pages?
-7. Когда GitHub Pages становится недостаточно.
-8. Выводы.
+5. Что ещё можно сделать на GitHub Pages?
+6. Когда GitHub Pages становится недостаточно.
+7. Выводы.
 
 ## Доклад
 
@@ -254,11 +253,115 @@ module.exports = config;
 > [!WARNING]
 > Для бесплатной версии GitHub ваша страница на GitHub Pages может быть только публичной.
 > Можно реализовать через связку User → Cloudflare Access → GitHub Pages, но страница все равно будет доступна по прямой
-> ссылке [it-enduro.github.io/docker-lectures](http://it-enduro.github.io/docker-lectures/).
+> ссылке [it-enduro.github.io/docker-lecture](http://it-enduro.github.io/docker-lecture/).
 
 ### Когда GitHub Pages становится недостаточно
 
-Если вам требуется интеграция с платежными формами, авторизация, хранение данных на backend, то статической страницы
+Если же вам требуется интеграция с платежными формами, авторизация, хранение данных на backend, то статической страницы
 будет уже недостаточно.
+
+GitHub Pages — это идеальный MVP для developer-проекта. Но как только проект становится продуктом — вам почти неизбежно
+нужен backend и полноценный хостинг.
+
+Как вариант можно использовать No-code платформы типа [Wix](https://wix.com/) или [Tilda](http://tilda.ru/) – это дает
+быстрый time-to-market: сайт можно быстро собрать из готовых компонентов, есть хостинг, CDN и SSL. Есть встроенные
+интеграции: формы с отправкой email или интеграцией с CRM, аналитика, базовый SEO, платежные системы. Но как только
+проект становится большим или нужно реализовать какую-то бизнес-логику, которая не заложена по-умолчанию, приходится
+изобретать велосипеды.
+
+Так же это дает vendor lock-in: сайт живет внутри платформы и перенос – это фактически переписывание всего сайта.
+
+По сути no-code — это не альтернатива разработке. Это способ отложить разработку до момента, когда она действительно
+нужна. Но в современных реалиях написать несложный сайт с backend и frontend с помощью GPT по затратам времени
+практически равно работе с no-code платформой.
+
+### Делаем свой сервер
+
+На определённом этапе GitHub Pages и no-code перестают покрывать требования. Следующий логичный шаг — собственный сервер
+с полным контролем над инфраструктурой.
+
+Минимальная production-схема выглядит так:
+
+```mermaid
+%%{init: {"theme": "neutral" }}%%
+flowchart TB
+    A("Internet"):::mark --> B("nginx (static + SSL termination)")
+    B:::mark --> C("Frontend (JavaScript + React)")
+    B:::mark --> D("Backend (node.js, Java)")
+    D:::mark --> E("Database"):::mark
+    classDef mark stroke-width: 2px;
+```
+
+1. Сервер поднимаем
+   на [AWS](https://aws.amazon.com/), [Azure](https://azure.microsoft.com/), [Яндекс Cloud](https://yandex.cloud/).
+   Минимально по ресурсам 1CPU, 2Gb, Linux OS.
+2. Устанавливаем и настраиваем nginx:
+   ```text
+   # /etc/nginx/sites-enabled/default.conf
+   server {
+     listen 80;
+     server_name {{ your-domain.com }};
+
+     location / {
+       root /var/www/site;
+       index index.html;
+     }
+     location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host              $http_host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+     }
+   }
+   ```
+3. Покупаем домен и настраиваем DNS: A record –> IP адрес сервера.
+4. Для HTTPS можно использовать бесплатный сертификат Let's Encrypt с помощью [certbot](https://certbot.eff.org/).
+   Установка сертификата выполняется с помощью команды `sudo certbot --nginx -d your-domain.com`.
+5. После этого в nginx нужно прописать использование сертификата и редирект на HTTPS:
+   ```text
+   # /etc/nginx/sites-enabled/default.conf
+   server {
+     listen 80;
+     server_name _;
+
+     location ^~ /.well-known/acme-challenge/ {
+       allow all;
+       root /var/www/letsencrypt;
+     }
+     location = /.well-known/acme-challenge/ {
+       return 404;
+     }
+     location / {
+       return 301 https://$host$request_uri;
+     }
+   }
+   ```
+   ```text
+   # /etc/nginx/sites-enabled/your-domain.com.conf
+   server {
+     listen 443;
+     server_name {{ your-domain.com }};
+
+     ssl_certificate         /etc/letsencrypt/live/{{ your-domain.com }}/fullchain.pem;
+     ssl_certificate_key     /etc/letsencrypt/live/{{ your-domain.com }}/privkey.pem;
+     ssl_trusted_certificate /etc/letsencrypt/live/{{ your-domain.com }}/chain.pem;
+
+     location / {
+       root /var/www/site;
+       index index.html;
+     }
+
+     location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+     }
+   }
+   ```
+6. ???
+7. ВЫ ПРЕКРАСНЫ!
 
 ### Выводы
