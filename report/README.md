@@ -149,9 +149,12 @@ jobs:
 синтаксис:
 
 * Checkbox;
-* Callouts (блоки уведомлений);
+* Alerts (блоки уведомлений);
 * Mermaid диаграммы;
-* HTML внутри Markdown (есть whitelist html тегов, которые разрешены);
+* Математические формулы;
+* HTML внутри Markdown (есть whitelist html тегов, которые разрешены (`style` запрещен)).
+
+[Пример расширенного форматирования](https://gist.github.com/Romanow/b51c34cb75a1e28aa7858b1f3b454611)
 
 Это может показаться странным, ведь есть ~~Confluence~~ множество других "удобных" инструментов для ведения
 документации? (а помните как мы раньше хейтили Confluence?)
@@ -286,10 +289,10 @@ GitHub Pages — это идеальный MVP для developer-проекта. 
 %%{init: {"theme": "neutral" }}%%
 flowchart TB
     A("Internet"):::mark --> B("nginx (static + SSL termination)")
-    B:::mark --> C("Frontend (JavaScript + React)")
+    B:::mark --> C("Frontend (JavaScript + React)"):::mark
     B:::mark --> D("Backend (node.js, Java)")
-    D:::mark --> E("Database"):::mark
-    classDef mark stroke-width: 2px;
+    D --> E("Database")
+    classDef mark stroke: #f00, stroke-width: 2px;
 ```
 
 1. Сервер поднимаем
